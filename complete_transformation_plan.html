@@ -1,0 +1,461 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .plan { padding: 1rem 0; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tab { padding: 7px 16px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); font-size: 13px; cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all .15s; }
+  .tab.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); font-weight: 500; }
+  .section { display: none; }
+  .section.active { display: block; }
+  h2 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
+  h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--color-text-primary); }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: var(--color-background-success); color: var(--color-text-success); }
+  .badge-blue { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-amber { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .badge-red { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; text-align: center; }
+  .metric-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 6px; text-align: center; }
+  .day-name { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .day-focus { font-size: 10px; color: var(--color-text-primary); }
+  .day-card.rest { opacity: 0.6; }
+  table { width: 100%; font-size: 13px; border-collapse: collapse; }
+  td, th { padding: 8px 10px; text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  th { font-weight: 500; color: var(--color-text-secondary); font-size: 12px; }
+  .progress-bar { height: 6px; background: var(--color-border-tertiary); border-radius: 3px; margin-top: 4px; }
+  .progress-fill { height: 6px; border-radius: 3px; }
+  .exercise-list { list-style: none; }
+  .exercise-list li { padding: 7px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+  .exercise-list li:last-child { border-bottom: none; }
+  .sets-badge { font-size: 11px; color: var(--color-text-secondary); }
+  .phase-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .timeline { position: relative; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 1rem; align-items: flex-start; }
+  .timeline-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; margin-top: 2px; }
+  .timeline-content { flex: 1; }
+  .macro-row { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .macro-pill { flex: 1; min-width: 80px; text-align: center; padding: 10px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
+  .macro-val { font-size: 18px; font-weight: 500; }
+  .macro-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .supplement-card { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .supplement-card:last-child { border-bottom: none; }
+  .supp-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .supp-info { flex: 1; }
+  .supp-name { font-size: 13px; font-weight: 500; }
+  .supp-detail { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .budget-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+  .budget-row:last-child { border-bottom: none; }
+</style>
+
+<div class="plan">
+  <div class="tabs">
+    <button class="tab active" onclick="show('overview')">Overview</button>
+    <button class="tab" onclick="show('gym')">Gym Plan</button>
+    <button class="tab" onclick="show('diet')">Diet & Budget</button>
+    <button class="tab" onclick="show('supplements')">Supplements</button>
+    <button class="tab" onclick="show('phases')">6-Month Plan</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section active">
+    <div class="metric-row">
+      <div class="metric">
+        <div class="metric-val">100kg</div>
+        <div class="metric-label">Current weight</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">72kg</div>
+        <div class="metric-label">Target weight</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">₹300</div>
+        <div class="metric-label">Daily budget</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric">
+        <div class="metric-val">~28kg</div>
+        <div class="metric-label">Fat to lose</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">1,800</div>
+        <div class="metric-label">Target calories/day</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">150g</div>
+        <div class="metric-label">Protein/day</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Weekly split at a glance</h3>
+      <div class="day-grid" style="margin-top:8px;">
+        <div class="day-card"><div class="day-name">Mon</div><div class="day-focus">Chest<br>Triceps</div></div>
+        <div class="day-card"><div class="day-name">Tue</div><div class="day-focus">Back<br>Biceps</div></div>
+        <div class="day-card"><div class="day-name">Wed</div><div class="day-focus">Legs<br>Core</div></div>
+        <div class="day-card"><div class="day-name">Thu</div><div class="day-focus">Cardio<br>HIIT</div></div>
+        <div class="day-card"><div class="day-name">Fri</div><div class="day-focus">Shoulder<br>Core</div></div>
+        <div class="day-card"><div class="day-name">Sat</div><div class="day-focus">Full<br>Body</div></div>
+        <div class="day-card rest"><div class="day-name">Sun</div><div class="day-focus">Rest<br>Walk</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Golden rules for success</h3>
+      <ul style="list-style:none;font-size:13px;line-height:1.9;color:var(--color-text-primary)">
+        <li>🔥 Caloric deficit of 500–700 kcal/day</li>
+        <li>💧 4–5 litres of water daily</li>
+        <li>😴 7–8 hours sleep — muscle is built during sleep</li>
+        <li>🥩 Eat protein with every single meal</li>
+        <li>🚫 No refined sugar, maida, or fried food</li>
+        <li>📸 Take weekly progress photos</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- GYM PLAN -->
+  <div id="gym" class="section">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Monday — Chest + Triceps</h3>
+        <span class="badge badge-blue">Push day</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Flat bench press <span class="sets-badge">4×10</span></li>
+        <li>Incline dumbbell press <span class="sets-badge">3×12</span></li>
+        <li>Cable chest flyes <span class="sets-badge">3×15</span></li>
+        <li>Tricep pushdown (rope) <span class="sets-badge">3×15</span></li>
+        <li>Overhead tricep extension <span class="sets-badge">3×12</span></li>
+        <li>Dips (assisted if needed) <span class="sets-badge">3×10</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Tuesday — Back + Biceps</h3>
+        <span class="badge badge-green">Pull day</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Lat pulldown <span class="sets-badge">4×12</span></li>
+        <li>Seated cable row <span class="sets-badge">3×12</span></li>
+        <li>Dumbbell bent-over row <span class="sets-badge">3×10</span></li>
+        <li>Face pulls <span class="sets-badge">3×15</span></li>
+        <li>Barbell curl <span class="sets-badge">3×12</span></li>
+        <li>Hammer curl <span class="sets-badge">3×12</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Wednesday — Legs + Core</h3>
+        <span class="badge badge-amber">Leg day</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Barbell squat <span class="sets-badge">4×10</span></li>
+        <li>Leg press <span class="sets-badge">4×15</span></li>
+        <li>Romanian deadlift <span class="sets-badge">3×12</span></li>
+        <li>Leg curl <span class="sets-badge">3×15</span></li>
+        <li>Plank <span class="sets-badge">3×60s</span></li>
+        <li>Hanging leg raises <span class="sets-badge">3×15</span></li>
+        <li>Cable crunches <span class="sets-badge">3×20</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Thursday — Cardio + HIIT</h3>
+        <span class="badge badge-red">Fat burn</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Treadmill warm-up <span class="sets-badge">10 min</span></li>
+        <li>HIIT sprint intervals (30s on / 30s off) <span class="sets-badge">×10 rounds</span></li>
+        <li>Jump rope <span class="sets-badge">5 min</span></li>
+        <li>Battle ropes <span class="sets-badge">3×30s</span></li>
+        <li>Box jumps <span class="sets-badge">3×12</span></li>
+        <li>Cooldown + stretch <span class="sets-badge">10 min</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Friday — Shoulders + Core</h3>
+        <span class="badge badge-blue">Push day</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Seated dumbbell shoulder press <span class="sets-badge">4×12</span></li>
+        <li>Lateral raises <span class="sets-badge">4×15</span></li>
+        <li>Front raises <span class="sets-badge">3×12</span></li>
+        <li>Reverse pec deck (rear delts) <span class="sets-badge">3×15</span></li>
+        <li>Ab wheel rollout <span class="sets-badge">3×12</span></li>
+        <li>Russian twists <span class="sets-badge">3×20</span></li>
+        <li>Mountain climbers <span class="sets-badge">3×30s</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Saturday — Full Body + Cardio</h3>
+        <span class="badge badge-green">Full body</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Deadlift <span class="sets-badge">4×8</span></li>
+        <li>Pull-ups (assisted) <span class="sets-badge">3×10</span></li>
+        <li>Dumbbell lunges <span class="sets-badge">3×12/leg</span></li>
+        <li>Arnold press <span class="sets-badge">3×12</span></li>
+        <li>Incline treadmill walk <span class="sets-badge">20 min</span></li>
+        <li>Core circuit (planks, crunches, leg raises) <span class="sets-badge">3 rounds</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3>Sunday — Active Rest</h3>
+        <span class="badge badge-amber">Recovery</span>
+      </div>
+      <ul class="exercise-list">
+        <li>Light 30–40 min walk outdoors <span class="sets-badge">mandatory</span></li>
+        <li>Full body stretching / mobility <span class="sets-badge">15 min</span></li>
+        <li>Foam rolling <span class="sets-badge">optional</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DIET -->
+  <div id="diet" class="section">
+    <div class="macro-row">
+      <div class="macro-pill">
+        <div class="macro-val" style="color:var(--color-text-danger)">150g</div>
+        <div class="macro-label">Protein</div>
+      </div>
+      <div class="macro-pill">
+        <div class="macro-val" style="color:var(--color-text-warning)">180g</div>
+        <div class="macro-label">Carbs</div>
+      </div>
+      <div class="macro-pill">
+        <div class="macro-val" style="color:var(--color-text-success)">45g</div>
+        <div class="macro-label">Fats</div>
+      </div>
+      <div class="macro-pill">
+        <div class="macro-val" style="color:var(--color-text-info)">1750</div>
+        <div class="macro-label">Calories</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Daily meal plan</h3>
+      <table style="margin-top:8px">
+        <tr><th>Meal</th><th>Food</th><th>Protein</th><th>Cost</th></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">6:30 AM<br>Pre-workout</td><td style="font-size:13px">Banana + black coffee</td><td>2g</td><td>₹15</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">8:00 AM<br>Breakfast</td><td style="font-size:13px">6 egg whites + 2 whole eggs + oats (50g)</td><td>38g</td><td>₹40</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">11:00 AM<br>Mid-morning</td><td style="font-size:13px">Curd (200g) + fruit</td><td>14g</td><td>₹30</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">1:30 PM<br>Lunch</td><td style="font-size:13px">2 chapati + dal (1 katori) + sabzi + salad</td><td>22g</td><td>₹60</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">4:30 PM<br>Pre-gym snack</td><td style="font-size:13px">Chana (boiled, 100g) + lemon</td><td>19g</td><td>₹20</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">8:00 PM<br>Post-workout</td><td style="font-size:13px">Whey protein shake (1 scoop) + banana</td><td>25g</td><td>₹55</td></tr>
+        <tr><td style="font-size:12px;color:var(--color-text-secondary)">9:30 PM<br>Dinner</td><td style="font-size:13px">Chicken breast (150g) or paneer (100g) + vegetables + brown rice (50g)</td><td>35g</td><td>₹80</td></tr>
+        <tr style="font-weight:500"><td>Total</td><td></td><td>~155g</td><td>₹300</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Best protein sources in Bengaluru (budget)</h3>
+      <table>
+        <tr><th>Food</th><th>Protein/100g</th><th>Cost</th><th>Rating</th></tr>
+        <tr><td>Chicken breast</td><td>31g</td><td>₹200/kg</td><td><span class="badge badge-green">Best value</span></td></tr>
+        <tr><td>Eggs (whole)</td><td>13g</td><td>₹7/egg</td><td><span class="badge badge-green">Must eat</span></td></tr>
+        <tr><td>Toor/Moong dal</td><td>24g</td><td>₹100/kg</td><td><span class="badge badge-blue">Veg staple</span></td></tr>
+        <tr><td>Paneer (homemade)</td><td>18g</td><td>₹80/100g</td><td><span class="badge badge-blue">Good</span></td></tr>
+        <tr><td>Curd/Greek yogurt</td><td>11g</td><td>₹40/250g</td><td><span class="badge badge-blue">Daily</span></td></tr>
+        <tr><td>Chana (boiled)</td><td>19g</td><td>₹60/kg dry</td><td><span class="badge badge-green">Cheapest</span></td></tr>
+        <tr><td>Soya chunks</td><td>52g</td><td>₹60/100g dry</td><td><span class="badge badge-green">Best veg</span></td></tr>
+        <tr><td>Fish (rohu/catla)</td><td>22g</td><td>₹150/kg</td><td><span class="badge badge-blue">Good value</span></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Foods to avoid completely</h3>
+      <div style="font-size:13px;line-height:2;color:var(--color-text-secondary)">
+        Maida (white flour), samosas, puri, paratha with butter, biryani with oil, sugar, juices (tetrapack), soft drinks, chips, biscuits, white bread, excess rice (>1 cup), alcohol, fried snacks
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPLEMENTS -->
+  <div id="supplements" class="section">
+    <div class="card">
+      <h3>Priority 1 — Essential (buy these first)</h3>
+      <div style="margin-top:8px">
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-info)">💪</div>
+          <div class="supp-info">
+            <div class="supp-name">Whey Protein (MuscleBlaze / AS-IT-IS)</div>
+            <div class="supp-detail">1 scoop (30g) post-workout • Provides 24–25g protein • ₹1,200–1,500/kg • ~₹40/day • Buy from Flipkart/Amazon for best price</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-success)">⚡</div>
+          <div class="supp-info">
+            <div class="supp-name">Creatine Monohydrate</div>
+            <div class="supp-detail">5g daily (any time, with water) • Increases strength + muscle fullness • AS-IT-IS brand ₹500/250g • ~₹10/day • No loading phase needed</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-warning)">🌟</div>
+          <div class="supp-info">
+            <div class="supp-name">Multivitamin (HealthKart / Himalaya)</div>
+            <div class="supp-detail">1 tablet daily with food • Covers micronutrient gaps during deficit • ₹300–400 for 60 tabs • ~₹6/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Priority 2 — Important minerals & vitamins</h3>
+      <div style="margin-top:8px">
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-secondary)">🦴</div>
+          <div class="supp-info">
+            <div class="supp-name">Vitamin D3 + K2 (60,000 IU weekly)</div>
+            <div class="supp-detail">1 sachet/tablet per week • Critical for Indians — most are deficient • Helps muscle function + testosterone • Sunpharma Calcirol sachets ~₹15/week</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-secondary)">🫀</div>
+          <div class="supp-info">
+            <div class="supp-name">Magnesium Glycinate (400mg)</div>
+            <div class="supp-detail">At night before bed • Improves sleep quality + muscle recovery • Pure Nutrition brand ~₹600/60 caps • ~₹10/day</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-secondary)">🔬</div>
+          <div class="supp-info">
+            <div class="supp-name">Zinc + Magnesium (ZMA or standalone)</div>
+            <div class="supp-detail">Zinc 15–30mg daily • Supports testosterone, immunity, recovery • Himalaya zinc ₹150/60 tabs • ~₹3/day</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-secondary)">🌿</div>
+          <div class="supp-info">
+            <div class="supp-name">Omega-3 Fish Oil (1–2g EPA+DHA)</div>
+            <div class="supp-detail">2 caps daily with food • Reduces inflammation, supports joints, improves fat loss • HealthKart ₹400/60 caps • ~₹13/day</div>
+          </div>
+        </div>
+        <div class="supplement-card">
+          <div class="supp-icon" style="background:var(--color-background-secondary)">🍃</div>
+          <div class="supp-info">
+            <div class="supp-name">Ashwagandha (600mg KSM-66)</div>
+            <div class="supp-detail">1 cap daily morning • Reduces cortisol (belly fat hormone), improves strength + recovery • Himalaya / NutriJa ₹400/60 caps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Optional (once budget allows)</h3>
+      <div style="font-size:13px;line-height:2;color:var(--color-text-secondary)">
+        BCAA (only if training fasted) • Caffeine/pre-workout (or just black coffee) • Glutamine (for faster recovery) • Collagen peptides (for joints)
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--color-border-warning)">
+      <h3>⚠️ Monthly supplement budget estimate</h3>
+      <div class="budget-row"><span>Whey protein (1kg)</span><span style="font-weight:500">₹1,400</span></div>
+      <div class="budget-row"><span>Creatine (250g)</span><span style="font-weight:500">₹500</span></div>
+      <div class="budget-row"><span>Multivitamin</span><span style="font-weight:500">₹300</span></div>
+      <div class="budget-row"><span>Vitamin D3 + Omega-3</span><span style="font-weight:500">₹500</span></div>
+      <div class="budget-row"><span>Magnesium + Zinc</span><span style="font-weight:500">₹300</span></div>
+      <div class="budget-row" style="font-weight:500;font-size:14px"><span>Total / month</span><span style="color:var(--color-text-warning)">~₹3,000</span></div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:8px">= ₹100/day extra. Consider buying in bulk every 3 months to save ~20%.</div>
+    </div>
+  </div>
+
+  <!-- PHASES -->
+  <div id="phases" class="section">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--color-background-info);color:var(--color-text-info)">1–2</div>
+        <div class="timeline-content">
+          <div class="card">
+            <h3>Month 1–2: Foundation Phase</h3>
+            <div style="font-size:13px;line-height:1.8;color:var(--color-text-secondary)">
+              <strong style="color:var(--color-text-primary)">Goal:</strong> Build habits, learn form, drop 5–7kg<br>
+              <strong style="color:var(--color-text-primary)">Calories:</strong> 2,000 kcal/day (moderate deficit)<br>
+              <strong style="color:var(--color-text-primary)">Training:</strong> 4–5 days/week, focus on form not heavy weights<br>
+              <strong style="color:var(--color-text-primary)">Expected weight:</strong> 93–95kg<br>
+              <strong style="color:var(--color-text-primary)">Key focus:</strong> Fix sleep, cut sugar, hit protein targets, cardio 3×/week
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--color-background-warning);color:var(--color-text-warning)">3–4</div>
+        <div class="timeline-content">
+          <div class="card">
+            <h3>Month 3–4: Cutting Phase</h3>
+            <div style="font-size:13px;line-height:1.8;color:var(--color-text-secondary)">
+              <strong style="color:var(--color-text-primary)">Goal:</strong> Aggressive fat loss, 8–10kg drop<br>
+              <strong style="color:var(--color-text-primary)">Calories:</strong> 1,750 kcal/day (aggressive deficit)<br>
+              <strong style="color:var(--color-text-primary)">Training:</strong> 6 days/week, increase HIIT sessions<br>
+              <strong style="color:var(--color-text-primary)">Expected weight:</strong> 83–87kg<br>
+              <strong style="color:var(--color-text-primary)">Key focus:</strong> Protect muscle with high protein, add incline walks, track every meal
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--color-background-success);color:var(--color-text-success)">5–6</div>
+        <div class="timeline-content">
+          <div class="card">
+            <h3>Month 5–6: Definition Phase</h3>
+            <div style="font-size:13px;line-height:1.8;color:var(--color-text-secondary)">
+              <strong style="color:var(--color-text-primary)">Goal:</strong> Final 8–12kg loss, reveal core definition<br>
+              <strong style="color:var(--color-text-primary)">Calories:</strong> 1,600–1,700 kcal/day<br>
+              <strong style="color:var(--color-text-primary)">Training:</strong> 6 days/week, more cardio, core every session<br>
+              <strong style="color:var(--color-text-primary)">Expected weight:</strong> 73–78kg<br>
+              <strong style="color:var(--color-text-primary)">Key focus:</strong> Carb cycling, double core work, eliminate all cheat meals
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Core exercises — do EVERY gym session</h3>
+      <ul class="exercise-list">
+        <li>Plank <span class="sets-badge">3×45–60 sec</span></li>
+        <li>Hanging leg raises <span class="sets-badge">3×15</span></li>
+        <li>Cable crunches <span class="sets-badge">3×20</span></li>
+        <li>Bicycle crunches <span class="sets-badge">2×30</span></li>
+        <li>Ab wheel rollouts <span class="sets-badge">3×10</span></li>
+      </ul>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:8px">Remember: 6-pack is made in the kitchen. These exercises build the muscle — fat loss reveals it.</div>
+    </div>
+
+    <div class="card">
+      <h3>Monthly weight targets</h3>
+      <table>
+        <tr><th>Month</th><th>Target weight</th><th>Monthly drop</th></tr>
+        <tr><td>End of Month 1</td><td>96 kg</td><td>-4 kg</td></tr>
+        <tr><td>End of Month 2</td><td>91 kg</td><td>-5 kg</td></tr>
+        <tr><td>End of Month 3</td><td>86 kg</td><td>-5 kg</td></tr>
+        <tr><td>End of Month 4</td><td>81 kg</td><td>-5 kg</td></tr>
+        <tr><td>End of Month 5</td><td>77 kg</td><td>-4 kg</td></tr>
+        <tr><td>End of Month 6</td><td>73 kg</td><td>-4 kg</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
